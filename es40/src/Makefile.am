@@ -23,9 +23,9 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-bin_PROGRAMS = es40 es40_idb es40_lss es40_lsm es40_cfg
+bin_PROGRAMS = es40x es40x-idb es40x-lss es40x-lsm es40x-config
 
-es40_SOURCES = AliM1543C.cpp \
+es40x_SOURCES = AliM1543C.cpp \
        AliM1543C_ide.cpp \
        AliM1543C_usb.cpp \
        AlphaCPU.cpp \
@@ -67,7 +67,7 @@ es40_SOURCES = AliM1543C.cpp \
        gui/keymap.cpp \
        gui/scancodes.cpp \
        gui/sdl.cpp \
-        base/Bugcheck.cpp \
+       base/Bugcheck.cpp \
 	base/ErrorHandler.cpp \
 	base/Event.cpp \
 	base/Exception.cpp \
@@ -82,14 +82,14 @@ es40_SOURCES = AliM1543C.cpp \
 	base/Thread.cpp \
 	base/Timestamp.cpp
 
-es40_idb_SOURCES = $(es40_SOURCES)
-es40_lss_SOURCES = $(es40_SOURCES)
-es40_lsm_SOURCES = $(es40_SOURCES)
+es40x_idb_SOURCES = $(es40x_SOURCES)
+es40x_lss_SOURCES = $(es40x_SOURCES)
+es40x_lsm_SOURCES = $(es40x_SOURCES)
 
-es40_idb_CXXFLAGS = -DIDB
-es40_lss_CXXFLAGS = -DIDB -DLSS
-es40_lsm_CXXFLAGS = -DIDB -DLSM
+es40x_idb_CXXFLAGS = -DIDB
+es40x_lss_CXXFLAGS = -DIDB -DLSS
+es40x_lsm_CXXFLAGS = -DIDB -DLSM
 
-es40_cfg_SOURCES = es40-cfg.cpp \
+es40x_config_SOURCES = es40-cfg.cpp \
     base/Exception.cpp
 
