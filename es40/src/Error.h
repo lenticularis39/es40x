@@ -25,6 +25,6 @@
 #ifndef ES40X_ERROR_H
 #define ES40X_ERROR_H
 
-void FatalError(char *message);
+void FatalError(const char *message);
 
 #endif //ES40X_ERROR_H

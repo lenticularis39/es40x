@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void FatalError(char *message)
+void FatalError(const char *message)
 {
   fprintf(stderr, "es40x: fatal: %s\n", message);
   exit(EXIT_FAILURE);
