@@ -14,15 +14,17 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  *
  * Although this is not required, the author would appreciate being notified of, 
- * and receiving any modifications you may make to the source code that might serve
- * the general public.
+ * and receiving any modifications you may make to the source code that might
+ * serve the general public.
  */
 
 #include "StdAfx.h"
 #include "System.h"
+#include "Error.h"
 #include "Flash.h"
 #include "DPR.h"
 
@@ -103,8 +105,8 @@ void segv_handler(int signum)
  **/
 int main (int argc, char*argv[])
 {
-  const char* filename = 0;
-  FILE* f;
+  const char *confFileName;
+  FILE *confFile;
 
 #ifdef HAS_BACKTRACE
   signal(SIGSEGV, &segv_handler);
@@ -118,38 +120,49 @@ int main (int argc, char*argv[])
 #if defined(IDB)
     if((argc == 2 || argc == 3) && argv[1][0] != '@')
 #else
-      if(argc == 2)
+      if (argc == 2)
 #endif
       {
-        filename = argv[1];
+        confFileName = argv[1];
       }
       else
       {
-        for(int i = 0; path[i]; i++)
+        for (int i = 0; path[i]; i++)
         {
-          filename = path[i];
-          f = fopen(path[i], "r");
-          if(f != NULL)
+          confFileName = path[i];
+          confFile = fopen(path[i], "r");
+
+          if (confFile)
           {
-            fclose(f);
-            filename = path[i];
+            fclose(confFile);
+            confFileName = path[i];
             break;
           }
         }
-        if(filename == NULL)
+        if (!confFileName)
           FAILURE(FileNotFound, "configuration file");
       }
-    char*   ch1;
-    size_t  ll1;
-    f = fopen(filename, "rb");
-    fseek(f, 0, SEEK_END);
-    ll1 = ftell(f);
-    ch1 = (char*) calloc(ll1, 1);
-    fseek(f, 0, SEEK_SET);
-    ll1 = fread(ch1, 1, ll1, f);
-    CConfigurator*  c = new CConfigurator(0, 0, 0, ch1, ll1);
-    fclose(f);
-    free(ch1);
+
+    char *confFileBuffer;
+    size_t confFileLength;
+
+    // Open configuration file end measure its length.
+    confFile = fopen(confFileName, "rb");
+    if (!confFile)
+      FatalError("cannot open configuration file");
+
+    fseek(confFile, 0, SEEK_END);
+    confFileLength = ftell(confFile);
+    fseek(confFile, 0, SEEK_SET);
+
+    // Load file contents into buffer and load the buffer into the configurator
+    // object.
+    confFileBuffer = (char *) calloc(confFileLength, 1);
+    confFileLength = fread(confFileBuffer, 1, confFileLength, confFile);
+    CConfigurator *Config = new CConfigurator(0, 0, 0, confFileBuffer,
+                                              confFileLength);
+    fclose(confFile);
+    free(confFileBuffer);
 
     if(!theSystem)
       FAILURE(Configuration, "no system initialized");

@@ -45,6 +45,7 @@ es40x_SOURCES = AliM1543C.cpp \
        DPR.cpp \
        es40_debug.cpp \
        Ethernet.cpp \
+       Error.cpp \
        Flash.cpp \
        FloppyController.cpp \
        Keyboard.cpp \
