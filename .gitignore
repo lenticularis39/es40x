@@ -1,3 +1,21 @@
+# Development
 .idea
 build
+
+# Autotools
+es40/autom4te.cache/
+es40/compile
+es40/config.guess
+es40/src/config.h.in~
+es40/INSTALL
+es40/Makefile.in
+es40/aclocal.m4
+es40/config.sub
+es40/configure
+es40/depcomp
+es40/doc/Makefile.in
+es40/install-sh
+es40/m4/Makefile.in
+es40/missing
+es40/src/Makefile.in
 
