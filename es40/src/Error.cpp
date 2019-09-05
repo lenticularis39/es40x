@@ -36,3 +36,8 @@ void FatalError(const char *message)
   fprintf(stderr, "es40x: fatal: %s\n", message);
   exit(EXIT_FAILURE);
 }
+
+void Warning(const char *message)
+{
+  fprintf(stderr, "es40x: warning: %s\n", message);
+}
