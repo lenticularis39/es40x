@@ -402,11 +402,11 @@ CSystem::~CSystem()
 
   printf("Freeing memory in use by system...\n");
 
-  for(i = 0; i < iNumComponents; i++)
+  /*for(i = 0; i < iNumComponents; i++)
   {
     if (acComponents[i])
     delete acComponents[i];
-  }
+  }*/
 
   for(i = 0; i < iNumMemories; i++)
     free(asMemories[i]);
