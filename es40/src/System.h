@@ -1,148 +1,31 @@
-/** ES40 emulator.
+/* ES40x Alpha machine emulator.
  * Copyright (C) 2007-2008 by the ES40 Emulator Project
+ * Copyright (C) 2019 Tomas Glozar
  *
- * Website: http://sourceforge.net/projects/es40
- * E-mail : camiel@camicom.com
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
- * Although this is not required, the author would appreciate being notified of, 
- * and receiving any modifications you may make to the source code that might serve
- * the general public.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * Although this is not required, the author would appreciate being notified of,
+ * and receiving any modifications you may make to the source code that might
+ * serve the general public.
  */
 
+
 /**
- * \file 
  * Contains the definitions for the emulated Typhoon Chipset devices.
- *
- * $Id$
- *
- * X-1.34       Camiel Vanderhoeven                             26-MAR-2008
- *      Fix compiler warnings.
- *
- * X-1.33       Camiel Vanderhoeven                             14-MAR-2008
- *      Formatting.
- *
- * X-1.32       Camiel Vanderhoeven                             14-MAR-2008
- *   1. More meaningful exceptions replace throwing (int) 1.
- *   2. U64 macro replaces X64 macro.
- *
- * X-1.31       Camiel Vanderhoeven                             13-MAR-2008
- *      Create init(), start_threads() and stop_threads() functions.
- *
- * X-1.30       Camiel Vanderhoeven                             11-MAR-2008
- *      Named, debuggable mutexes.
- *
- * X-1.29       Camiel Vanderhoeven                             05-MAR-2008
- *      Multi-threading version.
- *
- * X-1.28       Camiel Vanderhoeven                             04-MAR-2008
- *      Support some basic MP features. (CPUID read from C-Chip MISC 
- *      register, inter-processor interrupts)
- *
- * X-1.27       Camiel Vanderhoeven                             26-FEB-2008
- *      Added CF8/CFC method for getting at PCI config space.
- *
- * X-1.26       Camiel Vanderhoeven                             08-FEB-2008
- *      Show originating device name on memory errors.
- *
- * X-1.25       Camiel Vanderhoeven                             04-FEB-2008
- *      Corrected a typo in the definition of PTE_SHIFT (2 should be 12)
- *      that caused an OpenVMS procgone bugcheck.
- *
- * X-1.24       Camiel Vanderhoeven                             01-FEB-2008
- *      Avoid unnecessary shift-operations to calculate constant values.
- *
- * X-1.23       Camiel Vanderhoeven                             08-JAN-2008
- *      Layout of comments.
- *
- * X-1.22       Camiel Vanderhoeven                             08-JAN-2008
- *      Split out chipset registers.
- *
- * X-1.21       Camiel Vanderhoeven                             07-JAN-2008
- *      DMA scatter/gather access. Split out some things.
- *
- * X-1.20       Camiel Vanderhoeven                             02-JAN-2008
- *      Comments.
- *
- * X-1.19       Camiel Vanderhoeven                             10-DEC-2007
- *      Added get_cpu
- *
- * X-1.18       Camiel Vanderhoeven                             10-DEC-2007
- *      Use configurator.
- *
- * X-1.17       Camiel Vanderhoeven                             2-DEC-2007
- *      Added support for code profiling, and for direct operations on the
- *      Tsunami/Typhoon's interrupt registers.
- *
- * X-1.16       Brian Wheeler                                   1-DEC-2007
- *      Added panic.
- *
- * X-1.15       Camiel Vanderhoeven                             16-NOV-2007
- *      Replaced PCI_ReadMem and PCI_WriteMem with PCI_Phys.
- *
- * X-1.14       Camiel Vanderhoeven                             18-APR-2007
- *      Faster lockstep mechanism (send info 50 cpu cycles at a time)
- *
- * X-1.13       Camiel Vanderhoeven                             11-APR-2007
- *      Moved all data that should be saved to a state file to a structure
- *      "state".
- *
- * X-1.12       Camiel Vanderhoeven                             10-APR-2007
- *      Replaced LoadROM(...) and SelectROM() calls with a single LoadROM()
- *      call. (See System.cpp, X-1.23).
- *
- * X-1.11       Camiel Vanderhoeven                             10-APR-2007
- *      Removed obsolete ROM-handling code.
- *
- * X-1.10       Camiel Vanderhoeven                             30-MAR-2007
- *      Added old changelog comments.
- *
- * X-1.9        Camiel Vanderhoeven                             1-MAR-2007
- *      Removes $-sign from variable names. The Sun C-compiler can't handle
- *      these.
- *
- * X-1.8        Camiel Vanderhoeven                             18-FEB-2007
- *      Added iSSCycles variable to handle cycle-counting/slow-clocking in 
- *      single-step mode.
- *
- * X-1.7        Camiel Vanderhoeven                             16-FEB-2007
- *   a) Replaced DoClock with run and single_step.
- *   b) Added support for slow-clocked devices.
- *
- * X-1.6        Camiel Vanderhoeven                             12-FEB-2007
- *      Added comments.
- *
- * X-1.5        Brian Wheeler                                   7-FEB-2007
- *      CSystem constructor takes filename of configuration file as an 
- *      argument.
- *
- * X-1.4        Camiel Vanderhoeven                             7-FEB-2007
- *      Added trace (pointer to CTraceEngine)
- *
- * X-1.3        Brian Wheeler                                   3-FEB-2007
- *      Formatting.
- *
- * X-1.2        Brian Wheeler                                   3-FEB-2007
- *      Add support for configuration file.
- *
- * X-1.1        Camiel Vanderhoeven                             19-JAN-2007
- *      Initial version in CVS.
- *
- * \author Camiel Vanderhoeven (camiel@camicom.com / http://www.camicom.com)
- **/
+ */
 #include "SystemComponent.h"
 #include "TraceEngine.h"
 
@@ -208,7 +91,7 @@ struct SConfig
  * The ES40 emulator has the following chipset configuration:
  *   - 1 x 21274-C1 Cchip (controller chip) - The Cchip controls the other chips in the
  *     chipset, as well as the DRAM memory array in a system. The Cchip interfaces with
- *     the CPU’s command and address buses.
+ *     the CPU's command and address buses.
  *   - 8 x 21274-D1 Dchip (data slice chip) - The Dchips interface with the system data
  *     bus and provide the data path between the CPU, DRAM memory, and the Pchip(s).
  *   - 2 x 21272-P1 Pchip (peripheral interface chip) - The interface to the PCI bus.
