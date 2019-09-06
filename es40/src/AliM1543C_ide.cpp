@@ -2280,6 +2280,8 @@ void CAliM1543C_ide::execute(int index)
     /***
            * Special cases:  commands we don't support, but return success.
            ***/
+    default:      // unknown/unhandled ATA command
+        Warning("alim1543c: Unknown IDE command");
     case 0xe0:    // standby now
     case 0xe1:    // idle immediate
     case 0xe2:    // standby
@@ -2293,11 +2295,6 @@ void CAliM1543C_ide::execute(int index)
       SEL_STATUS(index).err = false;
       SEL_COMMAND(index).command_in_progress = false;
       raise_interrupt(index);
-      break;
-
-    default:      // unknown/unhandled ATA command
-      ide_status(index);
-      Warning("Unknown IDE command");
       break;
     }
 
