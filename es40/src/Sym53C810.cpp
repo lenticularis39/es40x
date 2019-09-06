@@ -1,80 +1,32 @@
-/* ES40 emulator.
+/* ES40x Alpha machine emulator.
  * Copyright (C) 2007-2008 by the ES40 Emulator Project
+ * Copyright (C) 2019 Tomas Glozar
  *
- * WWW    : http://www.es40.org
- * E-mail : camiel@es40.org
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
- * Although this is not required, the author would appreciate being notified of, 
- * and receiving any modifications you may make to the source code that might serve
- * the general public.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * Although this is not required, the author would appreciate being notified of,
+ * and receiving any modifications you may make to the source code that might
+ * serve the general public.
  */
 
-/**
- * \file
- * Contains the code for the emulated Symbios SCSI controller.
- *
- * $Id$
- *
- * X-1.14       Camiel Vanderhoeven                             31-MAY-2008
- *      Changes to include parts of Poco.
- *
- * X-1.13       Camiel Vanderhoeven                             29-APR-2008
- *      CDiskController is no longer a CPCIDevice. devices that are both
- *      should multiple inherit both.
- *
- * X-1.12       Camiel Vanderhoeven                             25-MAR-2008
- *      Separate functions for different instructions, comments.
- *
- * X-1.11       Camiel Vanderhoeven                             14-MAR-2008
- *      Formatting.
- *
- * X-1.10       Camiel Vanderhoeven                             14-MAR-2008
- *   1. More meaningful exceptions replace throwing (int) 1.
- *   2. U64 macro replaces X64 macro.
- *
- * X-1.9        Camiel Vanderhoeven                             13-MAR-2008
- *      Create init(), start_threads() and stop_threads() functions.
- *
- * X-1.8        Camiel Vanderhoeven                             11-MAR-2008
- *      Named, debuggable mutexes.
- *
- * X-1.7        Camiel Vanderhoeven                             05-MAR-2008
- *      Multi-threading version.
- *
- * X-1.5        Brian Wheeler                                   27-FEB-2008
- *      Avoid compiler warnings.
- *
- * X-1.4        Camiel Vanderhoeven                             18-FEB-2008
- *      Debugging info on xfer size made conditional.
- *
- * X-1.3        Camiel Vanderhoeven                             17-FEB-2008
- *      Debugging info.
- *
- * X-1.2        Camiel Vanderhoeven                             16-FEB-2008
- *      Unique names for PCI config arrays.
- *
- * X-1.1        Camiel Vanderhoeven                             16-FEB-2008
- *      Created as a spinoff from 53C895 controller, as we couldn't get
- *      that chip to work properly with the OpenVMS driver.
- **/
 #if defined(DEBUG_SYM)
 #define DEBUG_SYM_REGS
 #define DEBUG_SYM_SCRIPTS
 #endif
+#include "Error.h"
 #include "StdAfx.h"
 #include "Sym53C810.h"
 #include "System.h"
@@ -894,9 +846,7 @@ void CSym53C810::WriteMem_Bar(int func, int bar, u32 address, int dsize, u32 dat
         break;
 
       default:
-        FAILURE_2(NotImplemented,
-                  "SYM: Write to unknown register at %02x with %08x.\n", address,
-                  data);
+        Warning("sym53c810: unknown scsi command");
       }
 
       MUTEX_UNLOCK(myRegLock);

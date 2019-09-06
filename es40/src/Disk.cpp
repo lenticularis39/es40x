@@ -1,126 +1,28 @@
-/* ES40 emulator.
+/* ES40x Alpha machine emulator.
  * Copyright (C) 2007-2008 by the ES40 Emulator Project
+ * Copyright (C) 2019 Tomas Glozar
  *
- * WWW    : http://sourceforge.net/projects/es40
- * E-mail : camiel@camicom.com
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
- * Although this is not required, the author would appreciate being notified of, 
- * and receiving any modifications you may make to the source code that might serve
- * the general public.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * Although this is not required, the author would appreciate being notified of,
+ * and receiving any modifications you may make to the source code that might
+ * serve the general public.
  */
 
-/**
- * \file
- * Contains code for the disk base class.
- *
- * $Id$
- *
- * X-1.31       Camiel Vanderhoeven                             02-APR-2008
- *      Fixed compiler warnings.
- *
- * X-1.30       Camiel Vanderhoeven                             16-MAR-2008
- *      Always reset dati.read when setting dati.available.
- *
- * X-1.29       Camiel Vanderhoeven                             14-MAR-2008
- *      Formatting.
- *
- * X-1.28       Camiel Vanderhoeven                             14-MAR-2008
- *   1. More meaningful exceptions replace throwing (int) 1.
- *   2. U64 macro replaces X64 macro.
- *
- * X-1.27       Brian Wheeler                                   27-FEB-2008
- *      Avoid compiler warnings.
- *
- * X-1.26       David Leonard                                   20-FEB-2008
- *      Return SYSTEM RESOURCE FAILURE sense if dato/dati buffer size is
- *      exceeded.
- *
- * X-1.25       Brian Wheeler                                   20-FEB-2008
- *      Support MSF in READ TOC scsi command.
- *
- * X-1.24       Brian Wheeler                                   18-FEB-2008
- *      Added vital product data page 0 (Required for Tru64).
- *
- * X-1.23       Camiel Vanderhoeven                             18-FEB-2008
- *      Removed support for CD-R/RW specific SCSI commands.
- *
- * X-1.22       Camiel Vanderhoeven                             18-FEB-2008
- *      READ CAPACITY returns the number of the last LBA (n-1); not the
- *      number of LBA's (n).
- *
- * X-1.20       Camiel Vanderhoeven                             17-FEB-2008
- *      Set up sense data when error occurs.
- *
- * X-1.19       Camiel Vanderhoeven                             17-FEB-2008
- *      Added REQUEST_SENSE scsi command.
- *
- * X-1.18       Camiel Vanderhoeven                             16-FEB-2008
- *      Added READ_LONG scsi command, and support for MODE_SENSE changeable
- *      parameter pages.
- *
- * X-1.17       Camiel Vanderhoeven                             21-JAN-2008
- *      OpenVMs doesn't like max 255 sectors.
- *
- * X-1.16       Camiel Vanderhoeven                             16-JAN-2008
- *      Less messages without debugging enabled.
- *
- * X-1.15       Brian Wheeler                                   14-JAN-2008
- *      Corrected output from read track info and read toc.
- *
- * X-1.14       Brian Wheeler/Camiel Vanderhoeven               14-JAN-2008
- *      Added read_track_info command, completed read_toc command.
- *
- * X-1.13       Camiel Vanderhoeven                             13-JAN-2008
- *      Determine best-fitting C/H/S lay-out.
- *
- * X-1.11       Brian Wheeler                                   13-JAN-2008
- *      More CD-ROM commands supported.
- *
- * X-1.10       Camiel Vanderhoeven                             12-JAN-2008
- *      Include SCSI engine, because this is common to both SCSI and ATAPI
- *      devices.
- *
- * X-1.9        Camiel Vanderhoeven                             09-JAN-2008
- *      Save disk state to state file.
- *
- * X-1.8        Camiel Vanderhoeven                             06-JAN-2008
- *      Set default blocksize to 2048 for cd-rom devices.
- *
- * X-1.7        Camiel Vanderhoeven                             06-JAN-2008
- *      Support changing the block size (required for SCSI, ATAPI).
- *
- * X-1.6        Camiel Vanderhoeven                             02-JAN-2008
- *      Cleanup.
- *
- * X-1.5        Camiel Vanderhoeven                             29-DEC-2007
- *      Fix memory-leak.
- *
- * X-1.4        Camiel Vanderhoeven                             28-DEC-2007
- *      Throw exceptions rather than just exiting when errors occur.
- *
- * X-1.3        Camiel Vanderhoeven                             28-DEC-2007
- *      Keep the compiler happy.
- *
- * X-1.2        Brian Wheeler                                   16-DEC-2007
- *      Fixed case of StdAfx.h.
- *
- * X-1.1        Camiel Vanderhoeven                             12-DEC-2007
- *      Initial version in CVS.
- **/
+#include "Error.h"
 #include "StdAfx.h"
 #include "Disk.h"
 
@@ -1552,8 +1454,7 @@ int CDisk::do_scsi_command()
     break;
 
   default:
-    FAILURE_2(NotImplemented, "%s: Unknown SCSI command 0x%02x.\n",
-              devid_string, state.scsi.cmd.data[0]);
+    Warning("disk: unknown scsi command");
   }
 
   return 0;
