@@ -120,6 +120,9 @@ CAliM1543C_ide::CAliM1543C_ide(CConfigurator*  cfg, CSystem*  c, int pcibus, int
  **/
 void CAliM1543C_ide::init()
 {
+  Warning("alim1543c is an experimental feature and may fail");
+  Warning("for other purposes than testing, please use sym53c810");
+
   add_function(0, AliM1543C_ide_cfg_data, AliM1543C_ide_cfg_mask);
 
   add_legacy_io(PRI_COMMAND, 0x1f0, 8);
